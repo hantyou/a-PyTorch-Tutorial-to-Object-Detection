@@ -488,10 +488,12 @@ class SSD300(nn.Module):
                     # If this box is already marked for suppression
                     if suppress[box] == 1:
                         continue
+                    condition = overlap[box] > max_overlap
+                    condition = torch.tensor(condition, dtype=torch.uint8).to(device)
 
                     # Suppress boxes whose overlaps (with this box) are greater than maximum overlap
                     # Find such boxes and update suppress indices
-                    suppress = torch.max(suppress, overlap[box] > max_overlap)
+                    suppress = torch.max(suppress, condition)
                     # The max operation retains previously suppressed boxes, like an 'OR' operation
 
                     # Don't suppress this box, even though it has an overlap of 1 with itself

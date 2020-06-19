@@ -1,6 +1,8 @@
 from torchvision import transforms
 from utils import *
 from PIL import Image, ImageDraw, ImageFont
+import cv2
+import numpy
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -96,7 +98,17 @@ def detect(original_image, min_score, max_overlap, top_k, suppress=None):
 
 
 if __name__ == '__main__':
-    img_path = '/media/ssd/ssd data/VOC2007/JPEGImages/000001.jpg'
-    original_image = Image.open(img_path, mode='r')
-    original_image = original_image.convert('RGB')
-    detect(original_image, min_score=0.2, max_overlap=0.5, top_k=200).show()
+    cv2.namedWindow("Detection Result", cv2.WINDOW_KEEPRATIO)
+    vid = cv2.VideoCapture(r"D:\Programming\MATLAB\video_prog\256x256\PETS2009_sample_1.mp4")
+    img_path = r'C:\Datasets\Pascal_VOC_2007\JPEGImages\000030.jpg'
+    step = 0
+    while (1):
+        step += 1
+        ret, frame_org = vid.read()
+        # original_image = Image.open(img_path, mode='r')
+        original_image = Image.fromarray(cv2.cvtColor(frame_org, cv2.COLOR_BGR2RGB))
+        # original_image = original_image.convert('RGB')
+        if step == 1 or step % 5 == 0:
+            result = detect(original_image, min_score=0.3, max_overlap=0.2, top_k=10)
+        cv2.imshow('Detection Result', cv2.cvtColor(numpy.asarray(result), cv2.COLOR_RGB2BGR))
+        cv2.waitKey(1)
